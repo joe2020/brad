@@ -1,0 +1,12 @@
+body {
+	width: 600px;
+}
+
+label {
+	width: 100px;
+	float: left;
+}
+
+input[type="submit"] {
+	float: right;
+}
