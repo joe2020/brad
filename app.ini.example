@@ -1,0 +1,4 @@
+db_servername=localhost
+db_username=some_username
+db_password=some_password
+db_database=dev_comment_system
