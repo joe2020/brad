@@ -24,19 +24,9 @@ function retrieve_comments($video_id) {
 	
 	if ($link !== false) {
 		$sql = "select `message`, `created_at` from `comment` where `video_id` = $video_id";
-		$results = mysqli_query($link, $sql);
+		$comments = db_query($link, $sql);
 
-		if (mysqli_errno($link) === 0) {
-			$row = mysqli_fetch_assoc($results);
-
-			while ($row !== null) {
-				$comments[] = $row;
-				$row = mysqli_fetch_assoc($results);
-			}
-			
-			mysqli_free_result($results);
-		}
-		else {
+		if ($comments === false) {
 			echo mysqli_error($link);
 		}
 		mysqli_close($link);
