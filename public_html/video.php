@@ -1,6 +1,7 @@
 <?php
 
 require_once 'db.php';
+require_once 'comments.php';
 
 function display_comments($comments) {
 	echo '<div class="comments">' . "\n";
@@ -15,24 +16,6 @@ function display_comments($comments) {
 	}
 	
 	echo '</div>';
-}
-
-function retrieve_comments($video_id) {
-	$comments = array();
-
-	$link = db_connect(null);
-	
-	if ($link !== false) {
-		$sql = "select `message`, `created_at` from `comment` where `video_id` = $video_id";
-		$comments = db_query($link, $sql);
-
-		if ($comments === false) {
-			echo mysqli_error($link);
-		}
-		mysqli_close($link);
-	}
-
-	return $comments;
 }
 
 ?>
