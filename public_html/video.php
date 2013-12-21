@@ -1,5 +1,7 @@
 <?php
 
+require_once 'db.php';
+
 function display_comments($comments) {
 	echo '<div class="comments">' . "\n";
 	
@@ -18,30 +20,24 @@ function display_comments($comments) {
 function retrieve_comments($video_id) {
 	$comments = array();
 
-	$settings = parse_ini_file('../app.ini');
-	$link = mysqli_connect($settings['db_servername'],
-						   $settings['db_username'],
-						   $settings['db_password'],
-						   $settings['db_database']);
+	$link = db_connect(null);
+	
+	if ($link !== false) {
+		$sql = "select `message`, `created_at` from `comment` where `video_id` = $video_id";
+		$results = mysqli_query($link, $sql);
 
-	if (mysqli_connect_errno($link) === 0) {
-		if (mysqli_set_charset($link, 'utf8') === true) {
-			$sql = "select `message`, `created_at` from `comment` where `video_id` = $video_id";
-			$results = mysqli_query($link, $sql);
+		if (mysqli_errno($link) === 0) {
+			$row = mysqli_fetch_assoc($results);
 
-			if (mysqli_errno($link) === 0) {
+			while ($row !== null) {
+				$comments[] = $row;
 				$row = mysqli_fetch_assoc($results);
-
-				while ($row !== null) {
-					$comments[] = $row;
-					$row = mysqli_fetch_assoc($results);
-				}
-				
-				mysqli_free_result($results);
 			}
-			else {
-				echo mysqli_error($link);
-			}
+			
+			mysqli_free_result($results);
+		}
+		else {
+			echo mysqli_error($link);
 		}
 		mysqli_close($link);
 	}
