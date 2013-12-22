@@ -6,7 +6,7 @@ function retrieve_comments($video_id) {
 	$link = db_connect(null);
 	
 	if ($link !== false) {
-		$sql = "select `message`, `created_at` from `comment` where `video_id` = $video_id";
+		$sql = "select `message`, unix_timestamp(convert_tz(`created_at`, @@global.time_zone, '+00:00')) as `created_at` from `comment` where `video_id` = $video_id";
 		$comments = db_query($link, $sql);
 
 		if ($comments === false) {
@@ -19,21 +19,21 @@ function retrieve_comments($video_id) {
 }
 
 function add_comment($video_id, $handle, $comment_text) {
-        $added_comment = false;
+	$added_comment = false;
 
-        $link = db_connect(null);
-        if ($link !== false) {
-                $comment_text = mysqli_real_escape_string($link, $comment_text);
+	$link = db_connect(null);
+	if ($link !== false) {
+		$comment_text = mysqli_real_escape_string($link, $comment_text);
 
-                $sql = "insert into comment (`video_id`, `message`) values ($video_id, '$comment_text')";
-                db_query($link, $sql);
+		$sql = "insert into comment (`video_id`, `message`) values ($video_id, '$comment_text')";
+		db_query($link, $sql);
 
-                if (mysqli_errno($link) === 0) {
-                        $added_comment = true;
-                }
+		if (mysqli_errno($link) === 0) {
+				$added_comment = true;
+		}
 
-                mysqli_close($link);
-        }
+		mysqli_close($link);
+	}
 
-        return $added_comment;
+	return $added_comment;
 }
