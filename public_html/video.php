@@ -1,7 +1,26 @@
 <?php
 
+session_start();
+
 require_once 'db.php';
 require_once 'comments.php';
+
+$form_data = array();
+if (isset($_SESSION['add_comment']['form_data'])) {
+	$form_data = $_SESSION['add_comment']['form_data'];
+}
+
+$message = '';
+if (isset($_SESSION['add_comment']['message'])) {
+	$message = $_SESSION['add_comment']['message'];
+}
+
+$errors = array();
+if (isset($_SESSION['add_comment']['errors'])) {
+	$errors = $_SESSION['add_comment']['errors'];
+}
+
+
 
 function display_comments($comments) {
 	echo '<div class="comments">' . "\n";
@@ -80,19 +99,38 @@ function display_comments($comments) {
 <iframe width="560" height="315" src="" frameborder="1" allowfullscreen></iframe>
 <div class="g-ytsubscribe" data-channel="" data-layout="default"></div>
 
-<form action="publish-comment.php" method="POST">
+<?php 
+	if (!empty($message)) {
+		echo '<div class="message">' . $message . '</div>';
+	}
+	
+	if ((!empty($errors)) && (is_array($errors))) {
+		echo '<div class="errors">Errors:';
+		echo '<ul>';
+			foreach ($errors as $error) {
+				echo '<li>' . $error . '</li>';
+			}
+		echo '</ul>';
+	}
+?>
+
+<?php if (empty($message)) { ?>
+<form name="add_comment" action="publish-comment.php" method="POST">
 <fieldset>
 	<legend>Add a Comment</legend>
 	<label for="handle">Handle</label>
-	<input type="text" name="handle" id="handle" value="" maxlength="64" />
+	<input type="text" name="handle" id="handle" value="<?php echo (isset($form_data['handle'])) ? $form_data['handle'] : ''; ?>" maxlength="64" />
 	<br /><br />
 	<label for="comment">Comment</label>
-	<textarea rows="6" cols="50" name="comment" id="comment"></textarea>
+	<textarea rows="6" cols="50" name="comment" id="comment"><?php echo (isset($form_data['comment'])) ? $form_data['comment'] : ''; ?></textarea>
 	<br /><br />
 	<input type="submit" value="Publish" />
 </fieldset>
 </form>
+<?php } ?>
 <?php display_comments(retrieve_comments(20)); ?>
+
+<?php unset($_SESSION['add_comment']); ?>
 
 </body>
 </html>
