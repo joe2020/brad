@@ -20,6 +20,11 @@ if (isset($_SESSION['add_comment']['errors'])) {
 	$errors = $_SESSION['add_comment']['errors'];
 }
 
+$last_insert_id = false;
+if (isset($_SESSION['add_comment']['last_insert_id'])) {
+	$last_insert_id = $_SESSION['add_comment']['last_insert_id'];
+}
+
 
 
 function display_comments($comments) {
@@ -128,7 +133,7 @@ function display_comments($comments) {
 </fieldset>
 </form>
 <?php } ?>
-<?php display_comments(retrieve_comments(20)); ?>
+<?php display_comments(retrieve_comments(20, $last_insert_id)); ?>
 
 <?php unset($_SESSION['add_comment']); ?>
 

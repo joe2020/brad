@@ -1,12 +1,20 @@
 <?php
 
-function retrieve_comments($video_id) {
+function retrieve_comments($video_id, $last_insert_id) {
 	$comments = array();
 
 	$link = db_connect(null);
 	
 	if ($link !== false) {
-		$sql = "select `message`, unix_timestamp(convert_tz(`created_at`, @@global.time_zone, '+00:00')) as `created_at` from `comment` where `video_id` = $video_id";
+		if ($last_insert_id === false) {
+			$sql = "select `message`, unix_timestamp(convert_tz(`created_at`, @@global.time_zone, '+00:00')) as `created_at` from `comment` where `video_id` = $video_id";
+		}
+		else {
+			$sql = "select `message`, unix_timestamp(convert_tz(`created_at`, @@global.time_zone, '+00:00')) as `created_at` from `comment` where `video_id` = $video_id and `id` = $last_insert_id
+					union
+					select `message`, unix_timestamp(convert_tz(`created_at`, @@global.time_zone, '+00:00')) as `created_at` from `comment` where `video_id` = $video_id and `id` != $last_insert_id					
+			";
+		}
 		$comments = db_query($link, $sql);
 
 		if ($comments === false) {
@@ -19,7 +27,7 @@ function retrieve_comments($video_id) {
 }
 
 function add_comment($video_id, $handle, $comment_text) {
-	$added_comment = false;
+	$last_insert_id = false;
 
 	$link = db_connect(null);
 	if ($link !== false) {
@@ -29,11 +37,12 @@ function add_comment($video_id, $handle, $comment_text) {
 		db_query($link, $sql);
 
 		if (mysqli_errno($link) === 0) {
-				$added_comment = true;
+			$last_insert_id = mysqli_insert_id($link);
+			$added_comment = true;
 		}
 
 		mysqli_close($link);
 	}
 
-	return $added_comment;
+	return $last_insert_id;
 }

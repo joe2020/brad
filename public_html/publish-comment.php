@@ -11,8 +11,11 @@ $_SESSION['add_comment']['form_data'] = $_POST;
 $comment = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
 if (!empty($comment['comment'])) {
-	if (add_comment(20, '', $comment['comment']) === true) {
+	$last_insert_id = add_comment(20, '', $comment['comment']);
+
+	if (last_insert_id !== false) {
 		$_SESSION['add_comment']['message'] = 'Thanks for the comment';
+		$_SESSION['add_comment']['last_insert_id'] = $last_insert_id;
 	}
 	else {
 		$_SESSION['add_comment']['errors'][] = 'Whoops. There was a problem.  Please try again later.';
