@@ -4,6 +4,9 @@ session_start();
 
 require_once 'db.php';
 require_once 'comments.php';
+require_once 'cookies.php';
+
+$accepts_cookies = does_client_accept_cookies();
 
 $form_data = array();
 if (isset($_SESSION['add_comment']['form_data'])) {
@@ -119,7 +122,11 @@ function display_comments($comments) {
 	}
 ?>
 
-<?php if (empty($message)) { ?>
+<?php if ($accepts_cookies === false) { ?>
+<div id="warning">Please enable cookies on your web browser.</div>
+<?php } ?>
+
+<?php if ((empty($message)) && ($accepts_cookies === true)) { ?>
 <form name="add_comment" action="publish-comment.php" method="POST">
 <fieldset>
 	<legend>Add a Comment</legend>
